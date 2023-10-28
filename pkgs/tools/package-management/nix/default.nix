@@ -196,6 +196,12 @@ in lib.makeExtensible (self: ({
     hash = "sha256-WNmifcTsN9aG1ONkv+l2BC4sHZZxtNKy0keqBHXXQ7w=";
   };
 
+  nix_test_tarball = common rec {
+    version = "2.20.0-pre";
+    hash = "sha256-T1aqdFg73UB1GjbeSE+iDQkku2/fNS8Fph07s4M570M=";
+    src = (fetchFromGitHub { owner = "drupol"; repo = "nix"; rev = "7f71fc7540502295202b075f82e89fcf993e7e3a"; inherit hash; });
+  };
+
   # The minimum Nix version supported by Nixpkgs
   # Note that some functionality *might* have been backported into this Nix version,
   # making this package an inaccurate representation of what features are available

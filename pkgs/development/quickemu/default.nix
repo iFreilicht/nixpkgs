@@ -32,19 +32,20 @@ let
     gnugrep
     gnused
     jq
-    lsb-release
     procps
     python3
     cdrtools
-    usbutils
-    util-linux
     unzip
     socat
-    swtpm
     wget
+    zsync
+  ] ++ lib.optionals stdenv.isLinux [
+    lsb-release
+    swtpm
+    usbutils
+    util-linux
     xdg-user-dirs
     xrandr
-    zsync
   ];
 in
 
@@ -61,11 +62,15 @@ stdenv.mkDerivation rec {
 
   postPatch = ''
     sed -i \
-      -e '/OVMF_CODE_4M.secboot.fd/s|ovmfs=(|ovmfs=("${OVMFFull.firmware}","${OVMFFull.variables}" |' \
-      -e '/OVMF_CODE_4M.fd/s|ovmfs=(|ovmfs=("${OVMF.firmware}","${OVMF.variables}" |' \
-      -e '/cp "''${VARS_IN}" "''${VARS_OUT}"/a chmod +w "''${VARS_OUT}"' \
-      -e 's/Icon=.*qemu.svg/Icon=qemu/' \
-      quickemu
+  '' +
+  lib.optionalString stdenv.isLinux ''
+    -e '/OVMF_CODE_4M.secboot.fd/s|ovmfs=(|ovmfs=("${OVMFFull.firmware}","${OVMFFull.variables}" |' \
+    -e '/OVMF_CODE_4M.fd/s|ovmfs=(|ovmfs=("${OVMF.firmware}","${OVMF.variables}" |' \
+  '' +
+  ''
+    -e '/cp "''${VARS_IN}" "''${VARS_OUT}"/a chmod +w "''${VARS_OUT}"' \
+    -e 's/Icon=.*qemu.svg/Icon=qemu/' \
+    quickemu
   '';
 
   nativeBuildInputs = [ makeWrapper installShellFiles ];
@@ -93,6 +98,7 @@ stdenv.mkDerivation rec {
     description = "Quickly create and run optimised Windows, macOS and Linux desktop virtual machines";
     homepage = "https://github.com/quickemu-project/quickemu";
     license = licenses.mit;
+    platforms = platforms.linux ++ platforms.darwin;
     maintainers = with maintainers; [ fedx-sudo ];
   };
 }
